@@ -23,32 +23,15 @@ export default function Navbar(props) {
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link active"
-                aria-current="page"
-                to="/textchange"
-              >
+              <Link className="nav-link active" aria-current="page" to="/textchange">
                 TextChange
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link active"
-                aria-current="page"
-                to="/fruits"
-              >
+              <Link className="nav-link active" aria-current="page" to="/fruits">
                 Fruits
               </Link>
             </li>
-            {/* <li className="nav-item">
-              <Link
-                className="nav-link active"
-                aria-current="page"
-                to="/classcompo"
-              >
-                News
-              </Link>
-            </li> */}
             <li className="nav-item">
               <Link className="nav-link" to="/general">
                 General

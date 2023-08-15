@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Usercard from './Usercard';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default class ClassCompo extends Component {
   capitlize = (str) => {
@@ -12,7 +13,8 @@ export default class ClassCompo extends Component {
     this.state = {
       data: [],
       page: 1,
-      loading: true
+      loading: true,
+      totalResults: 0
     };
     document.title = `${this.capitlize(this.props.category)} - NewsRoom`;
   }
@@ -30,41 +32,54 @@ export default class ClassCompo extends Component {
   };
 
   async getNews() {
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=597e3e5a8b3f4d3f94ac480aeee94baa&page=${this.state.page}&pageSize=${this.props.pageSize}`;
-    this.setState({ loading: true });
+    this.props.setProgress(10);
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     const data = await fetch(url);
+    this.props.setProgress(40);
     const jsonData = await data.json();
+    this.props.setProgress(100);
+
     this.setState({
       data: jsonData.articles,
+      totalResults: jsonData.totalResults,
       loading: false
     });
   }
+
+  fetchMoreData = async () => {
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${
+      this.props.category
+    }&apiKey=${this.props.apiKey}&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
+    this.setState({ page: this.state.page + 1 });
+    const data = await fetch(url);
+    const jsonData = await data.json();
+    this.setState({
+      data: this.state.data.concat(jsonData.articles),
+      totalResults: jsonData.totalResults
+    });
+  };
 
   async componentDidMount() {
     this.getNews();
   }
 
-  previousPage = async () => {
-    this.setState({ page: this.state.page - 1 });
-    this.getNews();
-  };
-
-  nextPage = async () => {
-    this.setState({ page: this.state.page + 1 });
-    this.getNews();
-  };
-
   render() {
     return (
       <>
-        <div className="container my-3">
-          <h1 className="text-center">
-            {this.capitlize(this.props.category)} Top Hedlines- NewsRoom
-          </h1>
-          {this.state.loading && <Loading />}
-          <div className="row">
-            {!this.state.loading &&
-              this.state.data.map((element) => {
+        <h1 className="text-center" style={{ margin: '30px 0px' }}>
+          {this.capitlize(this.props.category)} Top Hedlines- NewsRoom
+        </h1>
+        {this.state.loading && <Loading />}
+
+        <InfiniteScroll
+          dataLength={this.state.data.length}
+          next={this.fetchMoreData}
+          hasMore={this.state.totalResults !== this.state.data.length}
+          loader={<Loading />}
+        >
+          <div className="container">
+            <div className="row">
+              {this.state.data.map((element) => {
                 return (
                   <div key={element.url} className="col-md-4">
                     <Usercard
@@ -83,28 +98,9 @@ export default class ClassCompo extends Component {
                   </div>
                 );
               })}
+            </div>
           </div>
-          <div className="d-flex justify-content-between">
-            <button
-              type="button"
-              disabled={this.state.page <= 1}
-              className="btn btn-primary"
-              onClick={this.previousPage}
-            >
-              &larr; Previous
-            </button>
-            <button
-              type="button"
-              disabled={
-                this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)
-              }
-              className="btn btn-primary"
-              onClick={this.nextPage}
-            >
-              Next &rarr;
-            </button>
-          </div>
-        </div>
+        </InfiniteScroll>
       </>
     );
   }
