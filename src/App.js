@@ -1,7 +1,5 @@
 import './App.css';
 import Navbar from './Componants/Navbar';
-import Textchange from './Componants/Textchange';
-import Fruits from './Componants/Fruits';
 import { Route, Routes } from 'react-router-dom';
 import ClassCompo from './Componants/ClassCompo';
 import LoadingBar from 'react-top-loading-bar';
@@ -9,13 +7,12 @@ import { useState } from 'react';
 function App() {
   const [progress, setProgress] = useState(0);
   const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+  const pages = 20;
   return (
     <>
       <Navbar title="Home" />
       <LoadingBar color="#f11946" progress={progress} height={3} />
       <Routes>
-        <Route path="/textchange" element={<Textchange />} />
-        <Route path="/fruits" element={<Fruits />} />
         <Route
           exact
           path="/general"
@@ -24,7 +21,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="general"
-              pageSize={12}
+              pageSize={pages}
               category="general"
               country="in"
             />
@@ -38,7 +35,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="sports"
-              pageSize={12}
+              pageSize={pages}
               category="sports"
               country="in"
             />
@@ -52,7 +49,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="health"
-              pageSize={12}
+              pageSize={pages}
               category="health"
               country="in"
             />
@@ -66,7 +63,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="business"
-              pageSize={12}
+              pageSize={pages}
               category="business"
               country="in"
             />
@@ -80,7 +77,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="entertainment"
-              pageSize={12}
+              pageSize={pages}
               category="entertainment"
               country="in"
             />
@@ -94,7 +91,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="science"
-              pageSize={12}
+              pageSize={pages}
               category="science"
               country="in"
             />
@@ -108,7 +105,7 @@ function App() {
               apiKey={apiKey}
               setProgress={setProgress}
               key="technology"
-              pageSize={12}
+              pageSize={pages}
               category="technology"
               country="in"
             />

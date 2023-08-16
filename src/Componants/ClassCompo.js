@@ -1,107 +1,96 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import Usercard from './Usercard';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default class ClassCompo extends Component {
-  capitlize = (str) => {
+export default function ClassCompo(props) {
+  const capitlize = (str) => {
     return str[0].toUpperCase() + str.slice(1);
   };
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: [],
-      page: 1,
-      loading: true,
-      totalResults: 0
-    };
-    document.title = `${this.capitlize(this.props.category)} - NewsRoom`;
-  }
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [totalResults, setTotalResults] = useState(0);
 
-  static defaultProps = {
-    country: 'in',
-    category: 'general',
-    pageSize: 12
+  const getNews = async () => {
+    props.setProgress(10);
+    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
+    const newsData = await fetch(url);
+    props.setProgress(40);
+    const jsonData = await newsData.json();
+    props.setProgress(100);
+    setLoading(false);
+    setData(jsonData.articles);
+    setTotalResults(jsonData.totalResults);
   };
 
-  static propTypes = {
-    country: PropTypes.string,
-    category: PropTypes.string,
-    pageSize: PropTypes.number
+  const fetchMoreData = async () => {
+    let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${
+      props.category
+    }&apiKey=${props.apiKey}&page=${page + 1}&pageSize=${props.pageSize}`;
+    setPage(page + 1);
+    const newsData = await fetch(url);
+    const jsonData = await newsData.json();
+    setData(data.concat(jsonData.articles));
+    setTotalResults(jsonData.totalResults);
   };
 
-  async getNews() {
-    this.props.setProgress(10);
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
-    const data = await fetch(url);
-    this.props.setProgress(40);
-    const jsonData = await data.json();
-    this.props.setProgress(100);
+  useEffect(() => {
+    document.title = `${capitlize(props.category)} - NewsRoom`;
+    getNews();
+    console.log('fetched data');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    this.setState({
-      data: jsonData.articles,
-      totalResults: jsonData.totalResults,
-      loading: false
-    });
-  }
+  return (
+    <>
+      <h1 className="text-center" style={{ margin: '30px 0px', marginTop: '80px' }}>
+        {capitlize(props.category)} Top Hedlines- NewsRoom
+      </h1>
+      {loading && <Loading />}
 
-  fetchMoreData = async () => {
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${
-      this.props.category
-    }&apiKey=${this.props.apiKey}&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
-    this.setState({ page: this.state.page + 1 });
-    const data = await fetch(url);
-    const jsonData = await data.json();
-    this.setState({
-      data: this.state.data.concat(jsonData.articles),
-      totalResults: jsonData.totalResults
-    });
-  };
-
-  async componentDidMount() {
-    this.getNews();
-  }
-
-  render() {
-    return (
-      <>
-        <h1 className="text-center" style={{ margin: '30px 0px' }}>
-          {this.capitlize(this.props.category)} Top Hedlines- NewsRoom
-        </h1>
-        {this.state.loading && <Loading />}
-
-        <InfiniteScroll
-          dataLength={this.state.data.length}
-          next={this.fetchMoreData}
-          hasMore={this.state.totalResults !== this.state.data.length}
-          loader={<Loading />}
-        >
-          <div className="container">
-            <div className="row">
-              {this.state.data.map((element) => {
-                return (
-                  <div key={element.url} className="col-md-4">
-                    <Usercard
-                      title={element.title ? element.title : 'not title'}
-                      image={
-                        element.urlToImage
-                          ? element.urlToImage
-                          : 'https://image.cnbcfm.com/api/v1/image/105899534-1557304890080gettyimages-859747880.jpeg?v=1691632496&w=1920&h=1080'
-                      }
-                      description={element.description ? element.description : 'no description'}
-                      visit={element.url}
-                      author={element.author}
-                      publishTime={element.publishedAt}
-                      source={element.source.name}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+      <InfiniteScroll
+        dataLength={data.length}
+        next={fetchMoreData}
+        hasMore={totalResults !== data.length}
+        loader={<Loading />}
+      >
+        <div className="container">
+          <div className="row">
+            {data.map((element) => {
+              return (
+                <div key={element.url} className="col-md-4">
+                  <Usercard
+                    title={element.title ? element.title : 'not title'}
+                    image={
+                      element.urlToImage
+                        ? element.urlToImage
+                        : 'https://image.cnbcfm.com/api/v1/image/105899534-1557304890080gettyimages-859747880.jpeg?v=1691632496&w=1920&h=1080'
+                    }
+                    description={element.description ? element.description : 'no description'}
+                    visit={element.url}
+                    author={element.author}
+                    publishTime={element.publishedAt}
+                    source={element.source.name}
+                  />
+                </div>
+              );
+            })}
           </div>
-        </InfiniteScroll>
-      </>
-    );
-  }
+        </div>
+      </InfiniteScroll>
+    </>
+  );
 }
+ClassCompo.defaultProps = {
+  country: 'in',
+  category: 'general',
+  pageSize: 12
+};
+
+ClassCompo.propTypes = {
+  country: PropTypes.string,
+  category: PropTypes.string,
+  pageSize: PropTypes.number
+};

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 export default function Navbar(props) {
   return (
-    <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
+    <nav className="navbar fixed-top navbar-expand-lg bg-dark navbar-dark">
       <div className="container-fluid">
         <button
           className="navbar-toggler"
@@ -20,16 +20,6 @@ export default function Navbar(props) {
             <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/">
                 {props.title}
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link active" aria-current="page" to="/textchange">
-                TextChange
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link active" aria-current="page" to="/fruits">
-                Fruits
               </Link>
             </li>
             <li className="nav-item">
