@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# News Room - The News App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+I have made this web application as reactjs project. I have used NewsApi to get the news and shows those news using the reactjs frontend. 
 
 ## Available Scripts
 
